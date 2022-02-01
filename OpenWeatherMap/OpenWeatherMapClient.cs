@@ -19,10 +19,11 @@ namespace OpenWeatherMap
         /// </summary>
         /// <param name="Name">Название населенного пункта</param>
         /// <returns></returns>
-        public async Task<WeatherLocation> GetLocationByName(int id, string Api)
+        public async Task<WeatherLocation> GetWeatherByName(string name, string Api)
         {
             return await _client.GetFromJsonAsync<WeatherLocation>(
-                $"http://api.openweathermap.org/data/2.5/weather?id={id}&lang=ru&appid={Api}");
+                $"/data/2.5/find?q={name}&lang=ru&appid={Api}&units=metric");
         }
     }
 }
+

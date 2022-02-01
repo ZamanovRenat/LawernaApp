@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenWeatherMap;
 
 namespace LawernaApp
 {
@@ -27,7 +28,7 @@ namespace LawernaApp
         /// <param name="services"></param>
         private static void ConfigureServices(HostBuilderContext host, IServiceCollection services)
         {
-            
+            services.AddHttpClient<OpenWeatherMapClient>(client => client.BaseAddress = new Uri(host.Configuration["Openweathermap"]));
         }
 
 
@@ -36,21 +37,17 @@ namespace LawernaApp
             using var host = hosting;
             await host.StartAsync();
 
-            await host.StopAsync();
+            var weather = Services.GetRequiredService<OpenWeatherMapClient>();
 
             string path = @"C:\Programs on C#\LawernaApp\ApiKey.txt";
+            string line = System.IO.File.ReadAllText(path);
 
-            using (StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    Console.WriteLine($"http://api.openweathermap.org/data/2.5/weather?id=524901&appid={line}&lang=ru");
-                }
-            }
+            Console.WriteLine("Введите название города");
+            string city = Console.ReadLine();
+
+            var location = await weather.GetWeatherByName(city, line);
+
+            await host.StopAsync();
         }
     }
 }
-
-/*http://api.openweathermap.org/data/2.5/weather?id=524901&appid={API key}&lang={lang}*/
-/*api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}*/
